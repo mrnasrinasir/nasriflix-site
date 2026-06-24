@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nasriflix — Notion Ambassador Portfolio</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root { --red: #e50914; --bg: #141414; }
+  html { scroll-behavior: smooth; }
+  body { background: var(--bg); color: #fff; font-family: 'Helvetica Neue', Arial, sans-serif; overflow-x: hidden; }
+
+  header { position: fixed; top: 0; left: 0; right: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; padding: 18px 4%; background: linear-gradient(180deg, rgba(0,0,0,0.85) 10%, transparent); transition: background 0.3s; }
+  header.scrolled { background: #141414; }
+  .logo { color: var(--red); font-size: 28px; font-weight: 800; letter-spacing: 1px; cursor: pointer; }
+  nav a { color: #e5e5e5; text-decoration: none; margin-left: 22px; font-size: 14px; transition: color 0.2s; }
+  nav a:hover { color: #b3b3b3; }
+  .avatar { width: 34px; height: 34px; border-radius: 5px; background: linear-gradient(135deg, var(--red), #b00610); display: inline-flex; align-items: center; justify-content: center; font-weight: 700; font-size: 15px; }
+
+  .hero { height: 84vh; min-height: 540px; display: flex; flex-direction: column; justify-content: center; padding: 0 4%; position: relative; background-size: cover; background-position: center; }
+  .hero::before { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, rgba(20,20,20,0.92) 0%, rgba(20,20,20,0.6) 45%, rgba(20,20,20,0.3) 100%); }
+  .hero::after { content: ""; position: absolute; bottom: 0; left: 0; right: 0; height: 200px; background: linear-gradient(0deg, var(--bg), transparent); }
+  .hero > * { position: relative; z-index: 2; }
+  .hero-tag { color: var(--red); font-weight: 700; letter-spacing: 3px; font-size: 13px; margin-bottom: 12px; }
+  .hero h1 { font-size: clamp(34px, 6vw, 68px); font-weight: 800; max-width: 760px; line-height: 1.04; }
+  .hero p { max-width: 560px; margin-top: 18px; font-size: 17px; color: #e6e6e6; line-height: 1.5; text-shadow: 0 1px 6px rgba(0,0,0,0.6); }
+  .hero-meta { margin-top: 16px; font-size: 14px; color: #9ad29a; }
+  .hero-btns { margin-top: 26px; display: flex; gap: 14px; flex-wrap: wrap; }
+  .btn { border: none; cursor: pointer; font-size: 16px; font-weight: 700; padding: 11px 26px; border-radius: 5px; display: inline-flex; align-items: center; gap: 8px; text-decoration: none; }
+  .btn-play { background: #fff; color: #000; }
+  .btn-play:hover { background: rgba(255,255,255,0.78); }
+  .btn-info { background: rgba(109,109,110,0.65); color: #fff; }
+  .btn-info:hover { background: rgba(109,109,110,0.45); }
+
+  .rows { position: relative; z-index: 5; margin-top: -90px; padding-bottom: 40px; }
+  .row { margin: 30px 0; }
+  .row h2 { font-size: 22px; font-weight: 700; margin: 0 0 10px 4%; }
+  .row-track { display: flex; gap: 10px; overflow-x: auto; padding: 8px 4% 20px; scroll-behavior: smooth; scrollbar-width: none; }
+  .row-track::-webkit-scrollbar { display: none; }
+
+  .card { flex: 0 0 auto; width: 260px; height: 150px; border-radius: 7px; cursor: pointer; position: relative; overflow: hidden; transition: transform 0.3s ease; color: #fff; background-size: cover; background-position: center; }
+  .card:hover { transform: scale(1.08); z-index: 10; box-shadow: 0 10px 30px rgba(0,0,0,0.7); }
+  .card-art { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: flex-end; padding: 14px; background-size: cover; background-position: center; }
+  .card-art::before { content: ""; position: absolute; inset: 0; background: linear-gradient(0deg, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.15) 55%, rgba(0,0,0,0.05) 100%); }
+  .card-title { position: relative; font-weight: 700; font-size: 16px; line-height: 1.18; text-shadow: 0 1px 4px rgba(0,0,0,0.7); }
+  .card-sub { position: relative; font-size: 12px; color: #e0e0e0; margin-top: 4px; text-shadow: 0 1px 4px rgba(0,0,0,0.7); }
+  .badge { position: absolute; top: 10px; right: 10px; z-index: 2; font-size: 10px; font-weight: 700; padding: 3px 7px; border-radius: 4px; background: rgba(0,0,0,0.55); backdrop-filter: blur(2px); }
+  .badge.feat { background: var(--red); }
+
+  .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 200; display: none; align-items: center; justify-content: center; padding: 20px; }
+  .overlay.open { display: flex; }
+  .modal { background: #181818; border-radius: 10px; max-width: 580px; width: 100%; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.8); animation: pop 0.25s ease; position: relative; }
+  @keyframes pop { from { transform: scale(0.92); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+  .modal-art { height: 230px; display: flex; align-items: flex-end; padding: 22px; position: relative; background-size: cover; background-position: center; }
+  .modal-art::before { content: ""; position: absolute; inset: 0; background: linear-gradient(0deg, #181818 0%, rgba(24,24,24,0.2) 70%); }
+  .modal-art h2 { position: relative; font-size: 26px; font-weight: 800; line-height: 1.1; text-shadow: 0 1px 6px rgba(0,0,0,0.7); }
+  .modal-body { padding: 6px 24px 26px; }
+  .modal-meta { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin: 10px 0 16px; font-size: 13px; color: #bcbcbc; }
+  .tag { font-size: 12px; font-weight: 700; padding: 3px 9px; border-radius: 4px; background: #303030; }
+  .tag.feat { background: var(--red); color: #fff; }
+  .modal-body p { color: #d8d8d8; line-height: 1.55; font-size: 15px; }
+  .modal-link { display: inline-block; margin-top: 16px; color: #fff; background: var(--red); padding: 9px 18px; border-radius: 5px; text-decoration: none; font-weight: 700; font-size: 14px; }
+  .close { position: absolute; top: 14px; right: 16px; z-index: 3; cursor: pointer; width: 34px; height: 34px; border-radius: 50%; background: rgba(20,20,20,0.7); border: none; color: #fff; font-size: 20px; }
+
+  .contact { padding: 20px 4% 10px; }
+  .contact h2 { font-size: 22px; font-weight: 700; margin-bottom: 14px; }
+  .links { display: flex; flex-wrap: wrap; gap: 12px; }
+  .links a { color: #d2d2d2; text-decoration: none; background: #232323; padding: 9px 16px; border-radius: 6px; font-size: 14px; transition: background 0.2s, color 0.2s; }
+  .links a:hover { background: var(--red); color: #fff; }
+  footer { text-align: center; color: #777; font-size: 13px; padding: 36px 20px; }
+</style>
+</head>
+<body>
+
+<header id="nav">
+  <div class="logo" onclick="window.scrollTo({top:0,behavior:'smooth'})">NASRIFLIX</div>
+  <nav><a href="#talks">Talks</a><a href="#topics">Topics</a><a href="#offers">Work With Me</a><a href="#contact">Contact</a></nav>
+  <div class="avatar">N</div>
+</header>
+
+<section class="hero" id="hero">
+  <div class="hero-tag">★ NOTION AMBASSADOR · SPEAKER · CONSULTANT</div>
+  <h1>Nasri Nasir</h1>
+  <p>Notion consultant & Ambassador at work.flowers, helping teams build calmer operating systems — Notion-native, AI-enabled, and built for the human at the keyboard.</p>
+  <div class="hero-meta">● 12 talks & workshops · Singapore & APAC · 2025–2026</div>
+  <div class="hero-btns">
+    <button class="btn btn-play" onclick="openItem('Notion Media Mixer')">▶ Featured Talk</button>
+    <a class="btn btn-info" href="#talks">ⓘ Browse All</a>
+  </div>
+</section>
+
+<main class="rows" id="rows"></main>
+
+<section class="contact" id="contact">
+  <h2>Find me online</h2>
+  <div class="links">
+    <a href="http://nasrinasir.com" target="_blank">🌐 Website</a>
+    <a href="http://linkedin.com/in/mrnasrinasir" target="_blank">💼 LinkedIn</a>
+    <a href="https://instagram.com/mrnasrinasir" target="_blank">📸 Instagram</a>
+    <a href="https://x.com/mrnasrinasir" target="_blank">🐦 X</a>
+    <a href="https://tiktok.com/@mrnasrinasir" target="_blank">🎵 TikTok</a>
+    <a href="https://youtube.com/@mrnasrinasir" target="_blank">▶️ YouTube</a>
+    <a href="mailto:mrnasrinasir@gmail.com">📬 Email</a>
+  </div>
+</section>
+<footer>Nasriflix · Nasri Nasir — Notion Ambassador Portfolio · “I build systems people actually use.”</footer>
+
+<div class="overlay" id="overlay" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <button class="close" onclick="closeModal()">×</button>
+    <div class="modal-art" id="modalArt"><h2 id="modalTitle"></h2></div>
+    <div class="modal-body">
+      <div class="modal-meta" id="modalMeta"></div>
+      <p id="modalDesc"></p>
+      <div id="modalLink"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const images = {"media-mixer": "assets/images/media-mixer.jpg", "inside-notion": "assets/images/inside-notion.jpg", "ai-labs": "assets/images/ai-labs.jpg", "office-hour": "assets/images/office-hour.jpg", "network-school": "assets/images/network-school.jpg", "openclaw": "assets/images/openclaw.jpg", "custom-agents-action": "assets/images/custom-agents-action.jpg", "build-2026": "assets/images/build-2026.jpg", "wrap-party": "assets/images/wrap-party.jpg", "youtube-meetup": "assets/images/youtube-meetup.jpg", "notion-3": "assets/images/notion-3.jpg", "first-block": "assets/images/first-block.jpg"};
+
+  const talks = [
+    { name: "Notion Media Mixer", slug: "media-mixer", sub: "Custom Agents", loc: "Braveheart Sake Originals", role: "Speaker, Organizer", date: "9 Jun 2026", featured: true, desc: "A Notion community evening for media folks — journalists, podcasters, and creators — co-organised with Notion's APAC Brand & Comms Lead. Nasri's talk, Custom Agents for Media, demoed a Newsroom Triage Agent and a From Source to Story pipeline live." },
+    { name: "Inside Notion: Developer Mode, Design & AI with Randy Hunt", slug: "inside-notion", sub: "Notion Workers", loc: "Lorong AI, Singapore", role: "Speaker", date: "10 Jun 2026", featured: false, link: "https://notionsg.notion.site", desc: "An After Dark community session on Notion's Developer Platform. Nasri delivered 'Workers at Work.Flowers' — using Sync Workers to pull live data into Notion dashboards teams and investors trust." },
+    { name: "AI Labs Singapore", slug: "ai-labs", sub: "About AI Agents", loc: "WeWork Cross St", role: "Facilitator", date: "29 Apr 2026", featured: true, desc: "A hands-on build session where 40+ non-technical founders and operators each left with a working Notion Custom Agent. Nasri facilitated the move from 'the manual thing I keep doing' to a Roomba-style agent that just goes." },
+    { name: "Notion With Nasri Office Hour Sessions", slug: "office-hour", sub: "Virtual Session", loc: "Virtual Session", role: "Host", date: "Weekly", featured: true, desc: "Recurring weekly office hours (Thursdays 8:30–9:30pm SGT on LinkedIn) teaching calm, low-stress Notion systems, automation, and AI — hosted live by Nasri." },
+    { name: "Network School X Notion", slug: "network-school", sub: "Network School Forest City", loc: "Network School Forest City", role: "Speaker", date: "20 Apr 2026", featured: true, desc: "Spoke at Network School, Forest City, on building Notion-native operating systems." },
+    { name: "Openclaw SG X Notion", slug: "openclaw", sub: "Beaver + Custom Agents", loc: "SQ Collective", role: "Speaker, Organizer", date: "10 Apr 2026", featured: true, link: "https://nasrinasir.com/posts/hosting-openclaw-x-notion-event", desc: "The first OpenClaw x NotionSG community night — 500+ registered, 315 checked in. Nasri presented 'Engage the Community with Beaver + Notion Custom Agents Workflow', showing a self-improving knowledge loop." },
+    { name: "Custom Agents in Action Singapore", slug: "custom-agents-action", sub: "Community event", loc: "Singapore", role: "Supporter", date: "26 Feb 2026", featured: false, desc: "Supported a community showcase of custom agents in real-world workflows." },
+    { name: "Build your 2026 - Notion Event", slug: "build-2026", sub: "Planning workshop", loc: "SQ Collective", role: "Facilitator", date: "17 Jan 2026", featured: false, desc: "A start-of-year life-planning and goal-setting workshop hosted by Mikie Lee; Nasri facilitated using Notion to map goals and systems for 2026." },
+    { name: "The Great AI Ecosystem Wrap Party", slug: "wrap-party", sub: "AI community", loc: "Monk’s Brew", role: "Speaker", date: "5 Dec 2025", featured: false, desc: "A year-end gathering of the Singapore AI ecosystem; Nasri presented Notion AI Meeting Notes and how to leverage Notion." },
+    { name: "Notion X Youtube Meetup", slug: "youtube-meetup", sub: "Creator meetup", loc: "Republic Polytechnic RPIC", role: "Speaker", date: "20 Nov 2025", featured: false, desc: "A meetup connecting Notion and YouTube creators; shared systems for content workflows." },
+    { name: "Notion 3.0 Singapore Edition", slug: "notion-3", sub: "Product launch", loc: "Singapore", role: "Speaker", date: "23 Oct 2025", featured: false, desc: "Spoke at the Singapore edition celebrating Notion 3.0 and what it means for teams." },
+    { name: "First Block Live Notion Singapore", slug: "first-block", sub: "Live session", loc: "Singapore", role: "Facilitator", date: "28 Aug 2025", featured: false, desc: "Facilitated a First Block Live Notion session for the Singapore APAC community." }
+  ];
+
+  const topics = [
+    { name: "Calm operating systems", sub: "🧘 Philosophy", desc: "Software should reduce stress, not add to it. I design for the human at the keyboard, not the diagram." },
+    { name: "Notion-native thinking", sub: "🧱 Craft", desc: "Clean schemas, sensible relations, and systems a team can own long after handover." },
+    { name: "AI that earns its keep", sub: "⚙️ Automation", desc: "Practical automation that saves real time — not demos." },
+    { name: "Teaching & community", sub: "🎓 Sharing", desc: "Sharing patterns openly through workshops, LinkedIn Lives, templates, and the Singapore Notion community." },
+    { name: "Burnout-aware design", sub: "🌿 Wellbeing", desc: "Shaped by lived experience; building tools that protect attention and energy." },
+    { name: "Faith, family & presence", sub: "🤝 Values", desc: "The values that anchor everything else." }
+  ];
+
+  const offers = [
+    { name: "Notion System Design", sub: "CRM · PM · Wikis", desc: "Clean, scalable builds — CRMs, project management, knowledge bases, and delivery hubs your team can maintain." },
+    { name: "Workshops & Training", sub: "System Processes with AI", desc: "Standalone workshops, 1:1 Notion Expert Sessions, and team training tailored to your setup." },
+    { name: "AI & Automation", sub: "Zapier · Custom Agents", desc: "Database enrichment and workflow automation that removes repetitive admin — built to be maintained." },
+    { name: "Diagnostic Reviews", sub: "Roadmap & audit", desc: "A roadmap for simplifying operations and evaluating Notion fit; decide what to bring over, retire, or rebuild." }
+  ];
+
+  const palettes = [
+    "linear-gradient(135deg,#e50914,#7a0610)",
+    "linear-gradient(135deg,#1f4287,#071e3d)",
+    "linear-gradient(135deg,#5f0f40,#9a031e)",
+    "linear-gradient(135deg,#0b6e4f,#08313a)",
+    "linear-gradient(135deg,#3d2c8d,#1b1464)",
+    "linear-gradient(135deg,#b56917,#5c2c06)",
+    "linear-gradient(135deg,#2d6a4f,#1b4332)",
+    "linear-gradient(135deg,#6a040f,#370617)"
+  ];
+  function artFor(name){ let h=0; for(const c of name) h=(h*31+c.charCodeAt(0))%palettes.length; return palettes[h]; }
+  function bgFor(p){ return (p.slug && images[p.slug]) ? `url('${images[p.slug]}')` : artFor(p.name); }
+
+  const byName = {};
+  [...talks, ...topics, ...offers].forEach(i => byName[i.name] = i);
+
+  const sections = [
+    { id: "talks", title: "Featured Talks & Events", items: talks.filter(t => t.featured) },
+    { id: "latest", title: "Latest on Stage", items: talks },
+    { id: "topics", title: "Topics I Care About", items: topics },
+    { id: "offers", title: "Work With Me", items: offers }
+  ];
+
+  function card(p){
+    return `<div class="card" onclick="openItem('${p.name.replace(/'/g,"\\'")}')">
+      ${p.featured?'<span class="badge feat">★ FEATURED</span>':(p.role?`<span class="badge">${p.role.split(',')[0]}</span>`:'')}
+      <div class="card-art" style="background:${bgFor(p)} center/cover">
+        <div class="card-title">${p.name}</div>
+        ${p.sub?`<div class="card-sub">${p.sub}${p.date?' · '+p.date:''}</div>`:''}
+      </div>
+    </div>`;
+  }
+
+  document.getElementById('rows').innerHTML = sections.map(s => {
+    if(!s.items.length) return '';
+    return `<div class="row" id="${s.id}"><h2>${s.title}</h2><div class="row-track">${s.items.map(card).join('')}</div></div>`;
+  }).join('');
+
+  // Hero background = featured talk photo
+  const heroImg = images['media-mixer'];
+  if(heroImg) document.getElementById('hero').style.backgroundImage = `url('${heroImg}')`;
+
+  function openItem(name){
+    const p = byName[name]; if(!p) return;
+    document.getElementById('modalTitle').textContent = p.name;
+    document.getElementById('modalArt').style.background = `${bgFor(p)} center/cover`;
+    const meta = [];
+    if(p.featured) meta.push('<span class="tag feat">★ Featured</span>');
+    if(p.role) meta.push(`<span class="tag">${p.role}</span>`);
+    if(p.date) meta.push(`<span>${p.date}</span>`);
+    if(p.loc) meta.push(`<span>📍 ${p.loc}</span>`);
+    document.getElementById('modalMeta').innerHTML = meta.join('');
+    document.getElementById('modalDesc').textContent = p.desc || '';
+    document.getElementById('modalLink').innerHTML = p.link ? `<a class="modal-link" href="${p.link}" target="_blank">View event ↗</a>` : '';
+    document.getElementById('overlay').classList.add('open');
+  }
+  function closeModal(){ document.getElementById('overlay').classList.remove('open'); }
+  document.addEventListener('keydown', e => { if(e.key==='Escape') closeModal(); });
+  window.addEventListener('scroll', () => { document.getElementById('nav').classList.toggle('scrolled', window.scrollY > 20); });
+</script>
+</body>
+</html>

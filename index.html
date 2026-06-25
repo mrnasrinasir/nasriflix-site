@@ -49,7 +49,7 @@
 
   .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 200; display: none; align-items: center; justify-content: center; padding: 20px; }
   .overlay.open { display: flex; }
-  .modal { background: #181818; border-radius: 10px; max-width: 580px; width: 100%; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.8); animation: pop 0.25s ease; position: relative; }
+  .modal { background: #181818; border-radius: 10px; max-width: 580px; width: 100%; max-height: 92vh; overflow-x: hidden; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.8); animation: pop 0.25s ease; position: relative; }
   @keyframes pop { from { transform: scale(0.92); opacity: 0; } to { transform: scale(1); opacity: 1; } }
   .modal-art { height: 230px; display: flex; align-items: flex-end; padding: 22px; position: relative; background-size: cover; background-position: center; }
   .modal-art::before { content: ""; position: absolute; inset: 0; background: linear-gradient(0deg, #181818 0%, rgba(24,24,24,0.2) 70%); }
@@ -59,6 +59,10 @@
   .tag { font-size: 12px; font-weight: 700; padding: 3px 9px; border-radius: 4px; background: #303030; }
   .tag.feat { background: var(--red); color: #fff; }
   .modal-body p { color: #d8d8d8; line-height: 1.55; font-size: 15px; }
+  .modal-body h4 { color: #fff; font-size: 12px; letter-spacing: 1px; text-transform: uppercase; margin: 18px 0 8px; }
+  .modal-body ul { margin: 2px 0 4px; padding-left: 18px; color: #d8d8d8; font-size: 14px; line-height: 1.5; }
+  .modal-body ul li { margin-bottom: 7px; }
+  .modal-body p + p { margin-top: 10px; }
   .modal-link { display: inline-block; margin-top: 16px; color: #fff; background: var(--red); padding: 9px 18px; border-radius: 5px; text-decoration: none; font-weight: 700; font-size: 14px; }
   .close { position: absolute; top: 14px; right: 16px; z-index: 3; cursor: pointer; width: 34px; height: 34px; border-radius: 50%; background: rgba(20,20,20,0.7); border: none; color: #fff; font-size: 20px; }
 
@@ -111,28 +115,52 @@
     <div class="modal-art" id="modalArt"><h2 id="modalTitle"></h2></div>
     <div class="modal-body">
       <div class="modal-meta" id="modalMeta"></div>
-      <p id="modalDesc"></p>
+      <div id="modalDesc"></div>
       <div id="modalLink"></div>
     </div>
   </div>
 </div>
 
 <script>
-  const images = {"media-mixer": "assets/images/media-mixer.jpg", "inside-notion": "assets/images/inside-notion.jpg", "ai-labs": "assets/images/ai-labs.jpg", "office-hour": "assets/images/office-hour.jpg", "network-school": "assets/images/network-school.jpg", "openclaw": "assets/images/openclaw.jpg", "custom-agents-action": "assets/images/custom-agents-action.jpg", "build-2026": "assets/images/build-2026.jpg", "wrap-party": "assets/images/wrap-party.jpg", "youtube-meetup": "assets/images/youtube-meetup.jpg", "notion-3": "assets/images/notion-3.jpg", "first-block": "assets/images/first-block.jpg"};
+  const images = {"media-mixer":"assets/images/media-mixer.jpg","inside-notion":"assets/images/inside-notion.jpg","ai-labs":"assets/images/ai-labs.jpg","office-hour":"assets/images/office-hour.jpg","network-school":"assets/images/network-school.jpg","openclaw":"assets/images/openclaw.jpg","custom-agents-action":"assets/images/custom-agents-action.jpg","build-2026":"assets/images/build-2026.jpg","wrap-party":"assets/images/wrap-party.jpg","youtube-meetup":"assets/images/youtube-meetup.jpg","notion-3":"assets/images/notion-3.jpg","first-block":"assets/images/first-block.jpg"};
 
   const talks = [
-    { name: "Notion Media Mixer", slug: "media-mixer", sub: "Custom Agents", loc: "Braveheart Sake Originals", role: "Speaker, Organizer", date: "9 Jun 2026", featured: true, desc: "A Notion community evening for media folks — journalists, podcasters, and creators — co-organised with Notion's APAC Brand & Comms Lead. Nasri's talk, Custom Agents for Media, demoed a Newsroom Triage Agent and a From Source to Story pipeline live." },
-    { name: "Inside Notion: Developer Mode, Design & AI with Randy Hunt", slug: "inside-notion", sub: "Notion Workers", loc: "Lorong AI, Singapore", role: "Speaker", date: "10 Jun 2026", featured: false, link: "https://notionsg.notion.site", desc: "An After Dark community session on Notion's Developer Platform. Nasri delivered 'Workers at Work.Flowers' — using Sync Workers to pull live data into Notion dashboards teams and investors trust." },
-    { name: "AI Labs Singapore", slug: "ai-labs", sub: "About AI Agents", loc: "WeWork Cross St", role: "Facilitator", date: "29 Apr 2026", featured: true, desc: "A hands-on build session where 40+ non-technical founders and operators each left with a working Notion Custom Agent. Nasri facilitated the move from 'the manual thing I keep doing' to a Roomba-style agent that just goes." },
-    { name: "Notion With Nasri Office Hour Sessions", slug: "office-hour", sub: "Virtual Session", loc: "Virtual Session", role: "Host", date: "Weekly", featured: true, desc: "Recurring weekly office hours (Thursdays 8:30–9:30pm SGT on LinkedIn) teaching calm, low-stress Notion systems, automation, and AI — hosted live by Nasri." },
-    { name: "Network School X Notion", slug: "network-school", sub: "Network School Forest City", loc: "Network School Forest City", role: "Speaker", date: "20 Apr 2026", featured: true, desc: "Spoke at Network School, Forest City, on building Notion-native operating systems." },
-    { name: "Openclaw SG X Notion", slug: "openclaw", sub: "Beaver + Custom Agents", loc: "SQ Collective", role: "Speaker, Organizer", date: "10 Apr 2026", featured: true, link: "https://nasrinasir.com/posts/hosting-openclaw-x-notion-event", desc: "The first OpenClaw x NotionSG community night — 500+ registered, 315 checked in. Nasri presented 'Engage the Community with Beaver + Notion Custom Agents Workflow', showing a self-improving knowledge loop." },
-    { name: "Custom Agents in Action Singapore", slug: "custom-agents-action", sub: "Community event", loc: "Singapore", role: "Supporter", date: "26 Feb 2026", featured: false, desc: "Supported a community showcase of custom agents in real-world workflows." },
-    { name: "Build your 2026 - Notion Event", slug: "build-2026", sub: "Planning workshop", loc: "SQ Collective", role: "Facilitator", date: "17 Jan 2026", featured: false, desc: "A start-of-year life-planning and goal-setting workshop hosted by Mikie Lee; Nasri facilitated using Notion to map goals and systems for 2026." },
-    { name: "The Great AI Ecosystem Wrap Party", slug: "wrap-party", sub: "AI community", loc: "Monk’s Brew", role: "Speaker", date: "5 Dec 2025", featured: false, desc: "A year-end gathering of the Singapore AI ecosystem; Nasri presented Notion AI Meeting Notes and how to leverage Notion." },
-    { name: "Notion X Youtube Meetup", slug: "youtube-meetup", sub: "Creator meetup", loc: "Republic Polytechnic RPIC", role: "Speaker", date: "20 Nov 2025", featured: false, desc: "A meetup connecting Notion and YouTube creators; shared systems for content workflows." },
-    { name: "Notion 3.0 Singapore Edition", slug: "notion-3", sub: "Product launch", loc: "Singapore", role: "Speaker", date: "23 Oct 2025", featured: false, desc: "Spoke at the Singapore edition celebrating Notion 3.0 and what it means for teams." },
-    { name: "First Block Live Notion Singapore", slug: "first-block", sub: "Live session", loc: "Singapore", role: "Facilitator", date: "28 Aug 2025", featured: false, desc: "Facilitated a First Block Live Notion session for the Singapore APAC community." }
+    { name: "Notion Media Mixer", slug: "media-mixer", sub: "Custom Agents", loc: "Braveheart Sake Originals", role: "Speaker, Organizer", date: "9 Jun 2026", featured: true,
+      desc: "A Notion community evening for media folks — journalists, podcasters, and content creators — held at Braveheart Sake Originals and co-organised with Notion's APAC Brand & Comms Lead, Caro Huynh. The night paired short, practical talks with cocktails, all around one idea: how custom agents and Notion AI slot into real media workflows without ever touching the byline.",
+      covered: ["My talk, Custom Agents for Media — reframing AI as a teammate that handles the busy work so the human keeps the craft", "Live demo: a Newsroom Triage Agent that summarises an email, tags it (Priority + Type), scores it against a 'Worth Pursuing' rubric (0–10) and suggests the next action", "Live demo: a From Source to Story pipeline — a Themes Agent turning transcripts into article angles, plus a Social Agent drafting LinkedIn and X posts"],
+      takeaways: ["Agents do the busy work — triage, capture, organisation, repurposing — while judgement, voice, and the byline stay human", "The logic lives in editable Notion pages and a rubric, not a black-box prompt, so teams can tune it themselves", "Build it once for yourself, then package it as a reusable template for the whole team"],
+      outcome: "Ran the Themes Agent live on the evening's own meeting-notes transcript to show the pipeline end to end, and shared all three agents and their databases for attendees to duplicate for free." },
+    { name: "Inside Notion: Developer Mode, Design & AI with Randy Hunt", slug: "inside-notion", sub: "Notion Workers", loc: "Lorong AI, Singapore", role: "Speaker", date: "10 Jun 2026", featured: false, link: "https://notionsg.notion.site",
+      desc: "An 'After Dark' community session at Lorong AI bringing the Singapore Notion community together to explore Notion's Developer Platform — Workers, Syncs, Tools, and AI. The line-up ran Nicholas Lui on the evolution of Notion, Nasri on Workers at Work.Flowers, Jesslyn Sim on AI and the future of consulting, and a Q&A with Randy Hunt.",
+      covered: ["What a Sync Worker is — a small program that pulls data from any API on a schedule and writes it into a Notion database", "The 'Worker + Dashboard = Soulmates' pattern: Workers pull on a schedule, dashboards turn it into something you'd happily show an investor", "Worker 1 — a Unified Marketing Dashboard syncing GA4 data hourly with a full TRUNCATE + INSERT each run to avoid duplicates", "Worker 2 — a Notion → Google Workspace contact sync fired by a meeting-note automation webhook", "Notion Workers vs Zapier — why Workers win on cost and on keeping data queryable for Notion AI"],
+      takeaways: ["The new default stack: Sync Workers (pull) → Notion databases (hold) → Dashboards (surface) → Notion AI (reason)", "Notion handles the infrastructure, and coding agents can write the Worker code for you", "Workers are billed on CPU compute (cents/month); the public beta is live on Business and Enterprise plans"],
+      outcome: "Closed by inviting people to the weekly Office Hours (Thursdays 8:30–9:30pm SGT on LinkedIn) and shared the GA4 Notion Sync and Meeting Notes DB Worker repos." },
+    { name: "AI Labs Singapore", slug: "ai-labs", sub: "About AI Agents", loc: "WeWork Cross St", role: "Facilitator", date: "29 Apr 2026", featured: true,
+      desc: "A hands-on build session at WeWork Cross Street Exchange where 40+ non-technical founders, operators, and marketers walked in curious and walked out with a working Notion Custom Agent running on a workflow they actually care about. Less talk and demo, more sitting down, describing what you wanted, and building something real in under two hours.",
+      covered: ["Facilitating attendees from 'this is the manual thing I keep doing' to a Custom Agent that handles it, end to end", "Scoping a repetitive workflow and turning it into a Notion Custom Agent live"],
+      takeaways: ["Tony's framing landed best — a regular AI agent is a vacuum (you still have to run it); a Custom Agent is a Roomba (set it up once and it just goes)", "Non-technical people can build real, working agents in under two hours"],
+      outcome: "40+ working agents built on the day — a weekly site-crawler that flagged a Roblox rollout, a LinkedIn content agent, a daily Hacker News digest, and a Slack-triggered scheduling agent. People who arrived unsure they could do it left having proven they could." },
+    { name: "Notion With Nasri Office Hour Sessions", slug: "office-hour", sub: "Virtual Session", loc: "Virtual Session", role: "Host", date: "Weekly", featured: true,
+      desc: "Recurring weekly office hours (Thursdays 8:30–9:30pm SGT, live on LinkedIn) teaching calm, low-stress Notion systems, automation, and AI. An open, no-pressure space to bring your Notion questions and watch real builds happen live — hosted by Nasri." },
+    { name: "Network School X Notion", slug: "network-school", sub: "Network School Forest City", loc: "Network School Forest City", role: "Speaker", date: "20 Apr 2026", featured: true,
+      desc: "Spoke at Network School, Forest City, on building Notion-native operating systems — how to turn Notion into a calm, AI-enabled hub that a team or founder can actually run day to day." },
+    { name: "Openclaw SG X Notion", slug: "openclaw", sub: "Beaver + Custom Agents", loc: "SQ Collective", role: "Speaker, Organizer", date: "10 Apr 2026", featured: true, link: "https://nasrinasir.com/posts/hosting-openclaw-x-notion-event",
+      desc: "The first-ever community night bringing the OpenClaw and NotionSG worlds together, hosted at SQ Collective. Over 500 registered and 315 checked in — a packed room of builders, operators, and team leads from startups to enterprise (NVIDIA, DBS, TikTok, and GovTech among them), exploring what becomes possible when AI agents, community, and Notion converge.",
+      covered: ["'Engage the Community with Beaver + Notion Custom Agents Workflow' — Beaver, the OpenClaw agent built for the NotionSG community", "Layer 1: grounded Q&A from a curated Notion database, with a web fallback", "Layer 2: a Notion Custom Agent on a 9am scheduled job that scans for Notion news and updates the database Beaver reads from", "Live demo: contact enrichment from a business card dropped into Telegram, logged straight into a Notion CRM", "Agent-to-agent: Beaver debating bubble-tea flavours with Aira, with the conversation logged back into Notion"],
+      takeaways: ["'OpenClaw becomes the front door. Notion becomes the second brain. Together, they create a self-improving loop.'", "We're not just building systems — we're helping people breathe again"],
+      outcome: "Strong engagement on the demos and a wave of follow-ups — founders duct-taping five tools wanting one source of truth, enterprise leads asking what agents could do tomorrow, and Notion newcomers ready to dive in after seeing Beaver in action." },
+    { name: "Custom Agents in Action Singapore", slug: "custom-agents-action", sub: "Community event", loc: "Singapore", role: "Supporter", date: "26 Feb 2026", featured: false,
+      desc: "Supported a community showcase of Notion Custom Agents running in real-world workflows — helping attendees see what is possible and get hands-on." },
+    { name: "Build your 2026 - Notion Event", slug: "build-2026", sub: "Planning workshop", loc: "SQ Collective", role: "Facilitator", date: "17 Jan 2026", featured: false,
+      desc: "A start-of-year life-planning and goal-setting workshop at SQ Collective hosted by Mikie Lee. Nasri facilitated, using Notion to help attendees map their goals, systems, and personal productivity for the year ahead." },
+    { name: "The Great AI Ecosystem Wrap Party", slug: "wrap-party", sub: "AI community", loc: "Monk's Brew", role: "Speaker", date: "5 Dec 2025", featured: false,
+      desc: "A year-end gathering of the Singapore AI ecosystem at Monk's Brew. Nasri presented Notion AI Meeting Notes — showing the room how to capture, summarise, and act on meetings, and how to leverage Notion as the home for it all." },
+    { name: "Notion X Youtube Meetup", slug: "youtube-meetup", sub: "Creator meetup", loc: "Republic Polytechnic RPIC", role: "Speaker", date: "20 Nov 2025", featured: false,
+      desc: "A meetup at Republic Polytechnic (RPIC) connecting the Notion and YouTube creator communities; Nasri shared systems for content workflows and creating with Notion." },
+    { name: "Notion 3.0 Singapore Edition", slug: "notion-3", sub: "Product launch", loc: "Singapore", role: "Speaker", date: "23 Oct 2025", featured: false,
+      desc: "Spoke at the Singapore edition celebrating the Notion 3.0 launch — what the release means for teams and how to make the most of it." },
+    { name: "First Block Live Notion Singapore", slug: "first-block", sub: "Live session", loc: "Singapore", role: "Facilitator", date: "28 Aug 2025", featured: false,
+      desc: "Facilitated a First Block Live Notion session for the Singapore and APAC community — a welcoming first step into building with Notion." }
   ];
 
   const topics = [
@@ -203,7 +231,11 @@
     if(p.date) meta.push(`<span>${p.date}</span>`);
     if(p.loc) meta.push(`<span>📍 ${p.loc}</span>`);
     document.getElementById('modalMeta').innerHTML = meta.join('');
-    document.getElementById('modalDesc').textContent = p.desc || '';
+    let body = p.desc ? `<p>${p.desc}</p>` : '';
+    if(p.covered && p.covered.length){ body += `<h4>What I covered</h4><ul>${p.covered.map(x=>`<li>${x}</li>`).join('')}</ul>`; }
+    if(p.takeaways && p.takeaways.length){ body += `<h4>Key takeaways</h4><ul>${p.takeaways.map(x=>`<li>${x}</li>`).join('')}</ul>`; }
+    if(p.outcome){ body += `<h4>Outcome</h4><p>${p.outcome}</p>`; }
+    document.getElementById('modalDesc').innerHTML = body;
     document.getElementById('modalLink').innerHTML = p.link ? `<a class="modal-link" href="${p.link}" target="_blank">View event ↗</a>` : '';
     document.getElementById('overlay').classList.add('open');
   }

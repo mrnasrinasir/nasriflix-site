@@ -68,6 +68,19 @@
   .modal-link { display: inline-block; margin-top: 16px; color: #fff; background: var(--red); padding: 9px 18px; border-radius: 5px; text-decoration: none; font-weight: 700; font-size: 14px; }
   .modal-body .video-wrap { position: relative; width: 100%; padding-top: 56.25%; margin: 6px 0 16px; border-radius: 8px; overflow: hidden; background: #000; }
   .modal-body .video-wrap iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+  .modal-summary p { color: #d8d8d8; line-height: 1.55; font-size: 15px; }
+  .view-more-btn { margin: 14px 0 6px; background: rgba(255,255,255,0.12); color: #fff; border: 1px solid rgba(255,255,255,0.25); padding: 9px 18px; border-radius: 5px; font-weight: 700; font-size: 14px; cursor: pointer; transition: background 0.2s; }
+  .view-more-btn:hover { background: rgba(255,255,255,0.22); }
+  .modal-full { display: none; }
+  .modal-full.show { display: block; animation: fade 0.3s ease; }
+  @keyframes fade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+  #modalGallery h4 { color: #fff; font-size: 12px; letter-spacing: 1px; text-transform: uppercase; margin: 18px 0 8px; }
+  .gallery-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin: 6px 0 4px; }
+  .gallery-grid img { width: 100%; height: 132px; object-fit: cover; border-radius: 6px; cursor: pointer; transition: transform 0.25s ease; }
+  .gallery-grid img:hover { transform: scale(1.03); }
+  .lightbox { position: fixed; inset: 0; background: rgba(0,0,0,0.92); z-index: 300; display: none; align-items: center; justify-content: center; padding: 24px; cursor: zoom-out; }
+  .lightbox.open { display: flex; }
+  .lightbox img { max-width: 100%; max-height: 100%; border-radius: 8px; box-shadow: 0 10px 50px rgba(0,0,0,0.8); }
   .close { position: absolute; top: 14px; right: 16px; z-index: 3; cursor: pointer; width: 34px; height: 34px; border-radius: 50%; background: rgba(20,20,20,0.7); border: none; color: #fff; font-size: 20px; }
 
   .contact { padding: 20px 4% 10px; }
@@ -119,18 +132,26 @@
     <div class="modal-art" id="modalArt"><h2 id="modalTitle"></h2></div>
     <div class="modal-body">
       <div class="modal-meta" id="modalMeta"></div>
-      <div id="modalVideo"></div>
-      <div id="modalDesc"></div>
-      <div id="modalLink"></div>
+      <div id="modalSummary" class="modal-summary"></div>
+      <button id="viewMoreBtn" class="view-more-btn" onclick="expandModal()">View more ↓</button>
+      <div id="modalFull" class="modal-full">
+        <div id="modalVideo"></div>
+        <div id="modalDesc"></div>
+        <div id="modalGallery"></div>
+        <div id="modalLink"></div>
+      </div>
     </div>
   </div>
 </div>
 
+<div class="lightbox" id="lightbox" onclick="closeLightbox()"><img id="lightboxImg" src="" alt=""></div>
+
 <script>
   const images = {"media-mixer": "assets/images/media-mixer.jpg", "inside-notion": "assets/images/inside-notion.jpg", "ai-labs": "assets/images/ai-labs.jpg", "office-hour": "assets/images/office-hour.jpg", "network-school": "assets/images/network-school.jpg", "openclaw": "assets/images/openclaw.jpg", "custom-agents-action": "assets/images/custom-agents-action.jpg", "build-2026": "assets/images/build-2026.jpg", "wrap-party": "assets/images/wrap-party.jpg", "youtube-meetup": "assets/images/youtube-meetup.jpg", "notion-3": "assets/images/notion-3.jpg", "first-block": "assets/images/first-block.jpg"};
+  let currentItem = null;
 
   const talks = [
-    { name: "Notion Media Mixer", slug: "media-mixer", sub: "Custom Agents", loc: "Braveheart Sake Originals", role: "Speaker, Organizer", date: "9 Jun 2026", featured: true, video: "fTYUW5d1LjQ",
+    { name: "Notion Media Mixer", slug: "media-mixer", summary: "A Notion community night for media folks — short, practical talks on how custom agents and Notion AI fit real media workflows, paired with cocktails at Braveheart Sake Originals.", photos: ["assets/images/media-mixer-g1.jpg","assets/images/media-mixer-g2.jpg","assets/images/media-mixer-g3.jpg","assets/images/media-mixer-g4.jpg","assets/images/media-mixer-g5.jpg"], sub: "Custom Agents", loc: "Braveheart Sake Originals", role: "Speaker, Organizer", date: "9 Jun 2026", featured: true, video: "fTYUW5d1LjQ",
       desc: "A Notion community evening for media folks — journalists, podcasters, and content creators — held at Braveheart Sake Originals and co-organised with Notion's APAC Brand & Comms Lead, Caro Huynh. The night paired short, practical talks with cocktails, all around one idea: how custom agents and Notion AI slot into real media workflows without ever touching the byline.",
       covered: ["My talk, Custom Agents for Media — reframing AI as a teammate that handles the busy work so the human keeps the craft", "Live demo: a Newsroom Triage Agent that summarises an email, tags it (Priority + Type), scores it against a 'Worth Pursuing' rubric (0–10) and suggests the next action", "Live demo: a From Source to Story pipeline — a Themes Agent turning transcripts into article angles, plus a Social Agent drafting LinkedIn and X posts"],
       takeaways: ["Agents do the busy work — triage, capture, organisation, repurposing — while judgement, voice, and the byline stay human", "The logic lives in editable Notion pages and a rubric, not a black-box prompt, so teams can tune it themselves", "Build it once for yourself, then package it as a reusable template for the whole team"],
@@ -242,6 +263,7 @@
   }
   function openItem(name){
     const p = byName[name]; if(!p) return;
+    currentItem = p;
     document.getElementById('modalTitle').textContent = p.name;
     document.getElementById('modalArt').style.background = `${bgFor(p)} center/cover`;
     const meta = [];
@@ -250,23 +272,44 @@
     if(p.date) meta.push(`<span>${p.date}</span>`);
     if(p.loc) meta.push(`<span>📍 ${p.loc}</span>`);
     document.getElementById('modalMeta').innerHTML = meta.join('');
+    document.getElementById('modalSummary').innerHTML = (p.summary || p.desc) ? `<p>${p.summary || p.desc}</p>` : '';
     const vid = document.getElementById('modalVideo');
     if(p.playlist){
       vid.innerHTML = `<div class="video-wrap"><iframe src="https://www.youtube-nocookie.com/embed/videoseries?list=${p.playlist}&rel=0" title="${p.name}" loading="lazy" allow="accelerated-sensors; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>`;
     } else if(p.video){
       vid.innerHTML = `<div class="video-wrap"><iframe src="https://www.youtube-nocookie.com/embed/${p.video}?rel=0" title="${p.name}" loading="lazy" allow="accelerated-sensors; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>`;
     } else { vid.innerHTML = ''; }
-    let body = p.desc ? `<p>${p.desc}</p>` : '';
+    let body = (p.summary && p.desc) ? `<p>${p.desc}</p>` : '';
     if(p.covered && p.covered.length){ body += `<h4>What I covered</h4><ul>${p.covered.map(x=>`<li>${x}</li>`).join('')}</ul>`; }
     if(p.takeaways && p.takeaways.length){ body += `<h4>Key takeaways</h4><ul>${p.takeaways.map(x=>`<li>${x}</li>`).join('')}</ul>`; }
     if(p.outcome){ body += `<h4>Outcome</h4><p>${p.outcome}</p>`; }
     document.getElementById('modalDesc').innerHTML = body;
+    document.getElementById('modalGallery').innerHTML = '';
+    const hasFull = !!(body.trim() || p.video || p.playlist || (p.photos && p.photos.length) || p.link);
+    const full = document.getElementById('modalFull');
+    const moreBtn = document.getElementById('viewMoreBtn');
+    full.classList.remove('show');
+    moreBtn.style.display = hasFull ? 'inline-block' : 'none';
     const linkHref = p.playlist ? (p.channel || `https://www.youtube.com/playlist?list=${p.playlist}`) : p.link;
     const linkLabel = p.playlist ? 'Watch all sessions on YouTube ↗' : 'View event ↗';
     document.getElementById('modalLink').innerHTML = linkHref ? `<a class="modal-link" href="${linkHref}" target="_blank">${linkLabel}</a>` : '';
     document.getElementById('overlay').classList.add('open');
   }
-  function closeModal(){ document.getElementById('overlay').classList.remove('open'); document.getElementById('modalVideo').innerHTML = ''; }
+  function closeModal(){ document.getElementById('overlay').classList.remove('open'); document.getElementById('modalVideo').innerHTML = ''; document.getElementById('modalFull').classList.remove('show'); }
+  function expandModal(){
+    const full = document.getElementById('modalFull');
+    full.classList.add('show');
+    const btn = document.getElementById('viewMoreBtn');
+    if(btn) btn.style.display = 'none';
+    if(currentItem && currentItem.photos && currentItem.photos.length) buildGallery(currentItem.photos);
+  }
+  function buildGallery(photos){
+    const g = document.getElementById('modalGallery');
+    if(!photos || !photos.length){ g.innerHTML = ''; return; }
+    g.innerHTML = '<h4>Photos</h4><div class="gallery-grid">' + photos.map((src,i)=>`<img loading="lazy" src="${src}" alt="Photo ${i+1}" onclick="openLightbox(this.src)">`).join('') + '</div>';
+  }
+  function openLightbox(src){ document.getElementById('lightboxImg').src = src; document.getElementById('lightbox').classList.add('open'); }
+  function closeLightbox(){ document.getElementById('lightbox').classList.remove('open'); document.getElementById('lightboxImg').src = ''; }
   document.addEventListener('keydown', e => { if(e.key==='Escape') closeModal(); });
   window.addEventListener('scroll', () => { document.getElementById('nav').classList.toggle('scrolled', window.scrollY > 20); });
 </script>

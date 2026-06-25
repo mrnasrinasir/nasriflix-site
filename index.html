@@ -64,6 +64,10 @@
   .modal-body ul li { margin-bottom: 7px; }
   .modal-body p + p { margin-top: 10px; }
   .modal-link { display: inline-block; margin-top: 16px; color: #fff; background: var(--red); padding: 9px 18px; border-radius: 5px; text-decoration: none; font-weight: 700; font-size: 14px; }
+  .btn-details { margin-top: 14px; cursor: pointer; background: #303030; color: #fff; border: none; padding: 9px 18px; border-radius: 5px; font-weight: 700; font-size: 14px; }
+  .btn-details:hover { background: #3f3f3f; }
+  .details-box { margin-top: 4px; }
+  .details-box[hidden] { display: none; }
   .close { position: absolute; top: 14px; right: 16px; z-index: 3; cursor: pointer; width: 34px; height: 34px; border-radius: 50%; background: rgba(20,20,20,0.7); border: none; color: #fff; font-size: 20px; }
 
   .contact { padding: 20px 4% 10px; }
@@ -126,16 +130,19 @@
 
   const talks = [
     { name: "Notion Media Mixer", slug: "media-mixer", sub: "Custom Agents", loc: "Braveheart Sake Originals", role: "Speaker, Organizer", date: "9 Jun 2026", featured: true,
+      short: "A Notion community evening for media folks, exploring how Custom Agents fit real newsroom workflows — without ever touching the byline.",
       desc: "A Notion community evening for media folks — journalists, podcasters, and content creators — held at Braveheart Sake Originals and co-organised with Notion's APAC Brand & Comms Lead, Caro Huynh. The night paired short, practical talks with cocktails, all around one idea: how custom agents and Notion AI slot into real media workflows without ever touching the byline.",
       covered: ["My talk, Custom Agents for Media — reframing AI as a teammate that handles the busy work so the human keeps the craft", "Live demo: a Newsroom Triage Agent that summarises an email, tags it (Priority + Type), scores it against a 'Worth Pursuing' rubric (0–10) and suggests the next action", "Live demo: a From Source to Story pipeline — a Themes Agent turning transcripts into article angles, plus a Social Agent drafting LinkedIn and X posts"],
       takeaways: ["Agents do the busy work — triage, capture, organisation, repurposing — while judgement, voice, and the byline stay human", "The logic lives in editable Notion pages and a rubric, not a black-box prompt, so teams can tune it themselves", "Build it once for yourself, then package it as a reusable template for the whole team"],
       outcome: "Ran the Themes Agent live on the evening's own meeting-notes transcript to show the pipeline end to end, and shared all three agents and their databases for attendees to duplicate for free." },
-    { name: "Inside Notion: Developer Mode, Design & AI with Randy Hunt", slug: "inside-notion", sub: "Notion Workers", loc: "Lorong AI, Singapore", role: "Speaker", date: "10 Jun 2026", featured: false, link: "https://notionsg.notion.site",
+    { name: "Inside Notion: Developer Mode, Design & AI with Randy Hunt", slug: "inside-notion", sub: "Notion Workers", loc: "Lorong AI, Singapore", role: "Speaker", date: "10 Jun 2026", featured: false, link: "https://notionsg.notion.site/inside-notion",
+      short: "An 'After Dark' community session on Notion's Developer Platform — Workers, Syncs, Tools and AI — with a Q&A featuring Randy Hunt.",
       desc: "An 'After Dark' community session at Lorong AI bringing the Singapore Notion community together to explore Notion's Developer Platform — Workers, Syncs, Tools, and AI. The line-up ran Nicholas Lui on the evolution of Notion, Nasri on Workers at Work.Flowers, Jesslyn Sim on AI and the future of consulting, and a Q&A with Randy Hunt.",
       covered: ["What a Sync Worker is — a small program that pulls data from any API on a schedule and writes it into a Notion database", "The 'Worker + Dashboard = Soulmates' pattern: Workers pull on a schedule, dashboards turn it into something you'd happily show an investor", "Worker 1 — a Unified Marketing Dashboard syncing GA4 data hourly with a full TRUNCATE + INSERT each run to avoid duplicates", "Worker 2 — a Notion → Google Workspace contact sync fired by a meeting-note automation webhook", "Notion Workers vs Zapier — why Workers win on cost and on keeping data queryable for Notion AI"],
       takeaways: ["The new default stack: Sync Workers (pull) → Notion databases (hold) → Dashboards (surface) → Notion AI (reason)", "Notion handles the infrastructure, and coding agents can write the Worker code for you", "Workers are billed on CPU compute (cents/month); the public beta is live on Business and Enterprise plans"],
       outcome: "Closed by inviting people to the weekly Office Hours (Thursdays 8:30–9:30pm SGT on LinkedIn) and shared the GA4 Notion Sync and Meeting Notes DB Worker repos." },
     { name: "AI Labs Singapore", slug: "ai-labs", sub: "About AI Agents", loc: "WeWork Cross St", role: "Facilitator", date: "29 Apr 2026", featured: true,
+      short: "A hands-on session where 40+ non-technical founders each built a working Notion Custom Agent in under two hours.",
       desc: "A hands-on build session at WeWork Cross Street Exchange where 40+ non-technical founders, operators, and marketers walked in curious and walked out with a working Notion Custom Agent running on a workflow they actually care about. Less talk and demo, more sitting down, describing what you wanted, and building something real in under two hours.",
       covered: ["Facilitating attendees from 'this is the manual thing I keep doing' to a Custom Agent that handles it, end to end", "Scoping a repetitive workflow and turning it into a Notion Custom Agent live"],
       takeaways: ["Tony's framing landed best — a regular AI agent is a vacuum (you still have to run it); a Custom Agent is a Roomba (set it up once and it just goes)", "Non-technical people can build real, working agents in under two hours"],
@@ -145,6 +152,7 @@
     { name: "Network School X Notion", slug: "network-school", sub: "Network School Forest City", loc: "Network School Forest City", role: "Speaker", date: "20 Apr 2026", featured: true,
       desc: "Spoke at Network School, Forest City, on building Notion-native operating systems — how to turn Notion into a calm, AI-enabled hub that a team or founder can actually run day to day." },
     { name: "Openclaw SG X Notion", slug: "openclaw", sub: "Beaver + Custom Agents", loc: "SQ Collective", role: "Speaker, Organizer", date: "10 Apr 2026", featured: true, link: "https://nasrinasir.com/posts/hosting-openclaw-x-notion-event",
+      short: "The first-ever OpenClaw × NotionSG community night — 500+ registered, 315 checked in, from startups to enterprise.",
       desc: "The first-ever community night bringing the OpenClaw and NotionSG worlds together, hosted at SQ Collective. Over 500 registered and 315 checked in — a packed room of builders, operators, and team leads from startups to enterprise (NVIDIA, DBS, TikTok, and GovTech among them), exploring what becomes possible when AI agents, community, and Notion converge.",
       covered: ["'Engage the Community with Beaver + Notion Custom Agents Workflow' — Beaver, the OpenClaw agent built for the NotionSG community", "Layer 1: grounded Q&A from a curated Notion database, with a web fallback", "Layer 2: a Notion Custom Agent on a 9am scheduled job that scans for Notion news and updates the database Beaver reads from", "Live demo: contact enrichment from a business card dropped into Telegram, logged straight into a Notion CRM", "Agent-to-agent: Beaver debating bubble-tea flavours with Aira, with the conversation logged back into Notion"],
       takeaways: ["'OpenClaw becomes the front door. Notion becomes the second brain. Together, they create a self-improving loop.'", "We're not just building systems — we're helping people breathe again"],
@@ -217,7 +225,6 @@
     return `<div class="row" id="${s.id}"><h2>${s.title}</h2><div class="row-track">${s.items.map(card).join('')}</div></div>`;
   }).join('');
 
-  // Hero background = featured talk photo
   const heroImg = images['media-mixer'];
   if(heroImg) document.getElementById('hero').style.backgroundImage = `url('${heroImg}')`;
 
@@ -231,13 +238,23 @@
     if(p.date) meta.push(`<span>${p.date}</span>`);
     if(p.loc) meta.push(`<span>📍 ${p.loc}</span>`);
     document.getElementById('modalMeta').innerHTML = meta.join('');
-    let body = p.desc ? `<p>${p.desc}</p>` : '';
-    if(p.covered && p.covered.length){ body += `<h4>What I covered</h4><ul>${p.covered.map(x=>`<li>${x}</li>`).join('')}</ul>`; }
-    if(p.takeaways && p.takeaways.length){ body += `<h4>Key takeaways</h4><ul>${p.takeaways.map(x=>`<li>${x}</li>`).join('')}</ul>`; }
-    if(p.outcome){ body += `<h4>Outcome</h4><p>${p.outcome}</p>`; }
+    const intro = p.short || p.desc || '';
+    let detail = '';
+    if(p.short && p.desc && p.desc !== p.short){ detail += `<p>${p.desc}</p>`; }
+    if(p.covered && p.covered.length){ detail += `<h4>What I covered</h4><ul>${p.covered.map(x=>`<li>${x}</li>`).join('')}</ul>`; }
+    if(p.takeaways && p.takeaways.length){ detail += `<h4>Key takeaways</h4><ul>${p.takeaways.map(x=>`<li>${x}</li>`).join('')}</ul>`; }
+    if(p.outcome){ detail += `<h4>Outcome</h4><p>${p.outcome}</p>`; }
+    let body = intro ? `<p>${intro}</p>` : '';
+    if(detail){ body += `<button class="btn-details" id="detailsBtn" onclick="toggleDetails()">View details</button><div class="details-box" id="detailsBox" hidden>${detail}</div>`; }
     document.getElementById('modalDesc').innerHTML = body;
     document.getElementById('modalLink').innerHTML = p.link ? `<a class="modal-link" href="${p.link}" target="_blank">View event ↗</a>` : '';
     document.getElementById('overlay').classList.add('open');
+  }
+  function toggleDetails(){
+    const box = document.getElementById('detailsBox'), btn = document.getElementById('detailsBtn');
+    if(!box) return;
+    if(box.hasAttribute('hidden')){ box.removeAttribute('hidden'); btn.textContent = 'Hide details'; }
+    else { box.setAttribute('hidden',''); btn.textContent = 'View details'; }
   }
   function closeModal(){ document.getElementById('overlay').classList.remove('open'); }
   document.addEventListener('keydown', e => { if(e.key==='Escape') closeModal(); });
